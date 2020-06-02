@@ -80,7 +80,7 @@ export function clearDatabase(){
       );
 }
 
-export function adminScreen() {
+export default function adminScreen() {
   const [hasPermission, setHasPermission] = React.useState(null);
   const [scanned, setScanned] = React.useState(false);
 

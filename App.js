@@ -1,8 +1,8 @@
 import 'react-native-gesture-handler';
 import * as React from 'react';
-import { checkInScreen } from './components/checkInScreen.js';
-import { foodScreen } from './components/foodScreen.js';
-import { adminScreen } from './components/adminScreen.js'
+import checkInScreen from './components/checkInScreen.js';
+import foodScreen from './components/foodScreen.js';
+import adminScreen from './components/adminScreen.js'
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Platform, StatusBar, StyleSheet, View } from "react-native";
