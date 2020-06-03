@@ -4,7 +4,7 @@ import { QRCode } from 'react-native-custom-qr-codes-expo';
 import { Stitch, AnonymousCredential } from "mongodb-stitch-react-native-sdk";
 
 
-export default function checkInScreen() {
+export default function CheckInScreen() {
   const [value, onChangeText] = React.useState('enter your name here');
   const [textEditable, setTextEditable] = React.useState(true)
   

@@ -4,7 +4,7 @@ import { QRCode } from 'react-native-custom-qr-codes-expo';
 
 
 
-export default function foodScreen() {
+export default function FoodScreen() {
   const [value, onChangeText] = React.useState('enter your name here');
   const [textEditable, setTextEditable] = React.useState(true);
 
