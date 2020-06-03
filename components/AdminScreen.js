@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Text, View, TextInput, StyleSheet, Button } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import { Picker } from '@react-native-community/picker';
 
 export function addUser(user){
 
@@ -83,6 +84,7 @@ export function clearDatabase(){
 export default function AdminScreen() {
   const [hasPermission, setHasPermission] = React.useState(null);
   const [scanned, setScanned] = React.useState(false);
+  const [mode, setMode] = React.useState("checkin");
 
   React.useEffect(() => {
     (async () => {
@@ -119,13 +121,25 @@ export default function AdminScreen() {
       style={{
         flex: 1,
         flexDirection: 'column',
-        justifyContent: 'flex-end',
+        justifyContent: 'flex-start',
       }}>
-      <BarCodeScanner
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        style={StyleSheet.absoluteFillObject}
-      />
 
+      <View>
+        <Picker
+          selectedValue={mode}
+          onValueChange={(itemValue, itemIndex) => 
+            setMode(itemValue)
+          }>
+          <Picker.Item label="Check In" value="checkin" />
+          <Picker.Item label="Food" value="food" />
+        </Picker>
+      </View>
+      <View style={{flexGrow : 1}}>
+        <BarCodeScanner
+          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          style={StyleSheet.absoluteFillObject}
+        />
+      </View>
       {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
     </View>
   );

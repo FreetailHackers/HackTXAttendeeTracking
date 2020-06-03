@@ -1,15 +1,17 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useReducer, useMemo } from 'react';
+
 import { NavigationContainer } from '@react-navigation/native';
 import { AuthProvider } from './context/AuthContext';
 
 import { createStackNavigator } from '@react-navigation/stack';
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, Alert } from 'react-native';
 
 import CheckInScreen from './components/CheckInScreen.js';
 import FoodScreen from './components/FoodScreen.js';
 import AdminScreen from './components/AdminScreen.js'
 import Login from './components/Login.js'
+import Main from './components/Main.js'
 
 const Stack = createStackNavigator();
 
@@ -35,7 +37,9 @@ async function storeCurrUser(payload) {
   catch(e) {
     console.log(e)
   }
-} 
+}
+
+
 
 export default function App() {
   const initalState = {isLoading : true, isSignOut: false, authToken: null, email: null};
@@ -60,6 +64,15 @@ export default function App() {
     loadToken();
   }, []);
 
+  showAlert = (title, message) => {
+    Alert.alert(
+      title,
+      message,
+      [
+        {text: "OK", onPress: () => console.log("OK Pressed")},
+      ], {cancelable: false});
+  }
+
   const authContext = useMemo(() => ({
     signIn: async (payload) => {
       let authToken = null;
@@ -80,10 +93,15 @@ export default function App() {
           console.log(data);
           // Stores auth-token if successful
           if(data.message === undefined) {
-            id = data.user.id;
-            authToken = data.user.token;
-            storeCurrUser({id, authToken});
-            dispatch({type : "LOG_IN", authToken, id});
+            if(data.user.admin !== true && data.user.status.isSponsor !== true) {
+              showAlert("Error", "Invalid Login: User is not an admin or sponsor");
+            }
+            else {
+              id = data.user.id;
+              authToken = data.user.token;
+              storeCurrUser({id, authToken});
+              dispatch({type : "LOG_IN", authToken, id});
+            }
           }
       }).catch((err) => console.log(err));
     },
@@ -108,6 +126,7 @@ export default function App() {
           {
           state.authToken !== null ?
             <>
+              <Stack.Screen name="Main" component={Main} />
               <Stack.Screen name="Hackathon Check In" component={CheckInScreen} />
               <Stack.Screen name="Food Check In" component={FoodScreen} />
               <Stack.Screen name="Admin" component={AdminScreen} />
