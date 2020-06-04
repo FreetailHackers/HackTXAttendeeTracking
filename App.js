@@ -46,7 +46,7 @@ export default function App() {
   const [state, dispatch] = useReducer(reducer, initalState);
 
   useEffect(() => {
-    let loadToken = async () => {
+    (async () => {
       try {
         const raw = await AsyncStorage.getItem('@curr_user');
         if(raw) {
@@ -60,8 +60,7 @@ export default function App() {
       catch(e) {
         console.log(e)
       }
-    }
-    loadToken();
+    })();
   }, []);
 
   showAlert = (title, message) => {
