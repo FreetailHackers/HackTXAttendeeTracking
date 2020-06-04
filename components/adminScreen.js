@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Text, View, TextInput, StyleSheet, Button } from 'react-native';
+import { Text, View, TextInput, StyleSheet, Button, Alert } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-
+import PDFReader from 'rn-pdf-reader-js';
+import { viewResumePDF } from './pdfViewer.js';
 export function addUser(user){
 
     const requestOptions = {
@@ -15,12 +16,34 @@ export function addUser(user){
         .then(data => {
           console.log(data)
           console.log(data.hasOwnProperty("error"))
-          if (data.hasOwnProperty("error")){
-            alert("User already added!")
-          }else{
-            alert("User added!")
+          if (data.hasOwnProperty("error")) {
+            Alert.alert(
+              "Alert",
+              "User already added. View resume?",
+              [
+                { text: "Cancel", style: "cancel" },
+                { text: "OK", onPress: () => {
+                    console.log("OK pressed");
+                    viewResumePDF(data);
+                } }
+              ],
+              { cancelable: false }
+            );
           }
-
+          else {
+            Alert.alert(
+              "Alert",
+              "User added. View resume?",
+              [
+                { text: "Cancel", style: "cancel" },
+                { text: "OK", onPress: () => {
+                  console.log("OK pressed");
+                  viewResumePDF(data);
+                } }
+              ],
+              { cancelable: false }
+            );
+          }
         }
       );
 }
@@ -72,7 +95,7 @@ export function clearDatabase(){
           console.log(data)
           if (data.hasOwnProperty("error") || data.hasOwnProperty("message")){
             alert("Internal Error!")
-          }else{
+          } else{
             alert("Database cleared! Removed " + data["deletedCount"]["$numberInt"] + " entries.")
           }
 
