@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { Alert, Text, View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
-import { BarCodeScanner } from 'expo-barcode-scanner';
+import { Camera } from 'expo-camera';
 import { Picker } from '@react-native-community/picker';
 import AuthContext from '../context/AuthContext';
-import { proc } from 'react-native-reanimated';
 
 export default function AdminScreen() {
   const [hasPermission, setHasPermission] = React.useState(null);
@@ -16,7 +15,7 @@ export default function AdminScreen() {
 
   React.useEffect(() => {
     (async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      const { status } = await Camera.requestPermissionsAsync();
       setHasPermission(status === 'granted');
     })();
   }, []);
@@ -124,8 +123,9 @@ export default function AdminScreen() {
 
       </View>
       <View style={{flexGrow : 1}}>
-        <BarCodeScanner
+        <Camera
           onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          ratio='16:9'
           style={{flex: 1}}
         />
       </View>

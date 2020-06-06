@@ -7,11 +7,8 @@ import { AuthProvider } from './context/AuthContext';
 import { createStackNavigator } from '@react-navigation/stack';
 import { AsyncStorage, Alert } from 'react-native';
 
-import CheckInScreen from './components/CheckInScreen.js';
-import FoodScreen from './components/FoodScreen.js';
-import AdminScreen from './components/AdminScreen.js'
+import MainScreen from './components/MainScreen.js'
 import Login from './components/Login.js'
-import Main from './components/Main.js'
 
 const Stack = createStackNavigator();
 const REACT_NATIVE_SERVER_URL = "http://192.168.1.72:3000";
@@ -122,14 +119,11 @@ export default function App() {
   return (
     <NavigationContainer>
       <AuthProvider value={authContext}>
-        <Stack.Navigator>
+        <Stack.Navigator headerMode="none">
           {
           state.authToken !== null ?
             <>
-              <Stack.Screen name="Main" component={Main} />
-              <Stack.Screen name="Hackathon Check In" component={CheckInScreen} />
-              <Stack.Screen name="Food Check In" component={FoodScreen} />
-              <Stack.Screen name="Admin" component={AdminScreen} />
+              <Stack.Screen name="Main" component={MainScreen} />
             </>
             :
           <Stack.Screen name="Login" component={Login} />
