@@ -14,17 +14,16 @@ import Login from './components/Login.js'
 import Main from './components/Main.js'
 
 const Stack = createStackNavigator();
-
 const REACT_NATIVE_SERVER_URL = "http://192.168.1.72:3000";
 
 function reducer(prevState, action) {
   switch(action.type) {
     case "RESTORE_TOKEN":
-      return {...prevState, isLoading: false, authToken: action.authToken, id: action.id};
+      return {...prevState, isLoading: false, authToken: action.authToken, user: action.user, mode: action.mode};
     case "LOG_IN":
-      return {...prevState, isSignOut: false, authToken: action.authToken, id: action.id};
+      return {...prevState, isSignOut: false, authToken: action.authToken, user: action.user, mode: action.mode};
     case "LOG_OUT":
-      return {...prevState, isSignOut: true, authToken: null, email: null};
+      return {...prevState, isSignOut: true, authToken: null, authToken: null, user: null, mode: null};
     default:
       throw Error();
   }
@@ -42,7 +41,7 @@ async function storeCurrUser(payload) {
 
 
 export default function App() {
-  const initalState = {isLoading : true, isSignOut: false, authToken: null, email: null};
+  const initalState = {isLoading : true, isSignOut: false, authToken: null, user: null, mode: null};
   const [state, dispatch] = useReducer(reducer, initalState);
 
   useEffect(() => {
@@ -51,10 +50,11 @@ export default function App() {
         const raw = await AsyncStorage.getItem('@curr_user');
         if(raw) {
           const currUser = JSON.parse(raw);
-          dispatch({type : "RESTORE_TOKEN", authToken : currUser.authToken, id : currUser.id})
+          console.log(currUser);
+          dispatch({type : "RESTORE_TOKEN", authToken : currUser.authToken, user : currUser.user, mode : currUser.mode})
         }
         else {
-          dispatch({type : "RESTORE_TOKEN", authToken : null, id : null})
+          dispatch({type : "RESTORE_TOKEN", authToken : null, user : null, mode : null})
         }
       }
       catch(e) {
@@ -74,8 +74,6 @@ export default function App() {
 
   const authContext = useMemo(() => ({
     signIn: async (payload) => {
-      let authToken = null;
-      let email = null;
       // Calls login request
       console.log(REACT_NATIVE_SERVER_URL);
       await fetch(REACT_NATIVE_SERVER_URL + "/auth/login", {
@@ -92,14 +90,17 @@ export default function App() {
           console.log(data);
           // Stores auth-token if successful
           if(data.message === undefined) {
-            if(data.user.admin !== true && data.user.status.isSponsor !== true) {
+            if(data.user.admin !== true && data.user.sponsor !== true) {
               showAlert("Error", "Invalid Login: User is not an admin or sponsor");
             }
             else {
-              id = data.user.id;
-              authToken = data.user.token;
-              storeCurrUser({id, authToken});
-              dispatch({type : "LOG_IN", authToken, id});
+              let user = data.user;
+              let authToken = data.token;
+              let mode = null;
+              if(data.user.admin) mode = "admin";
+              else if(data.user.sponsor) mode = "sponsor"
+              storeCurrUser({authToken, user, mode});
+              dispatch({type : "LOG_IN", authToken, user, mode});
             }
           }
       }).catch((err) => console.log(err));

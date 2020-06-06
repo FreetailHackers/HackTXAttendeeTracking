@@ -2,90 +2,17 @@ import * as React from 'react';
 import { Alert, Text, View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Picker } from '@react-native-community/picker';
-
-export function addUser(user){
-
-    const requestOptions = {
-        method: 'POST',
-        headers: {'arg1': user },
-        queryParams: JSON.stringify({ arg1: user })
-    };
-
-    fetch('https://webhooks.mongodb-stitch.com/api/client/v2.0/app/hacktxapp-dufgi/service/add_user/incoming_webhook/webhook0?arg1='+user, requestOptions)
-        .then(response => response.json())
-        .then(data => {
-          console.log(data)
-          console.log(data.hasOwnProperty("error"))
-          if (data.hasOwnProperty("error")){
-            alert("User already added!")
-          }else{
-            alert("User added!")
-          }
-
-        }
-      );
-}
-
-export function setFoodCheckIn(user) {
-
-  const requestOptions = {
-      method: 'POST',
-      headers: {'arg1': user },
-      queryParams: JSON.stringify({ arg1: user })
-  };
-
-  fetch('https://webhooks.mongodb-stitch.com/api/client/v2.0/app/hacktxapp-dufgi/service/get_user/incoming_webhook/webhook0?arg1='+user, requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        if (data.hasOwnProperty("error")){
-          alert("Internal error!")
-        } else{
-          console.log(data["matchedCount"]["$numberInt"])
-          console.log(data["modifiedCount"]["$numberInt"])
-          if (data["matchedCount"]["$numberInt"] == 0) {
-            alert('Person has not checked in!')
-          }
-          else if (data["modifiedCount"]["$numberInt"] == 0 ) {
-              alert('This person has already received his food!')
-          }
-          else {
-              alert("Success! This person can get their food! ")
-          }
-        }
-
-      }
-    );
-
-}
-
-export function clearDatabase(){
-
-    const requestOptions = {
-        method: 'POST',
-        headers: {},
-        queryParams: JSON.stringify({})
-    };
-
-    fetch('https://webhooks.mongodb-stitch.com/api/client/v2.0/app/hacktxapp-dufgi/service/clear_database/incoming_webhook/webhook0', requestOptions)
-        .then(response => response.json())
-        .then(data => {
-          console.log(data)
-          if (data.hasOwnProperty("error") || data.hasOwnProperty("message")){
-            alert("Internal Error!")
-          }else{
-            alert("Database cleared! Removed " + data["deletedCount"]["$numberInt"] + " entries.")
-          }
-
-        }
-      );
-}
+import AuthContext from '../context/AuthContext';
+import { proc } from 'react-native-reanimated';
 
 export default function AdminScreen() {
   const [hasPermission, setHasPermission] = React.useState(null);
   const [scanned, setScanned] = React.useState(false);
-  const [mode, setMode] = React.useState("checkin");
+  const [mode, setMode] = React.useState(null);
   const [confirm, setConfirm] = React.useState(false);
+
+  const {authToken} = React.useContext(AuthContext);
+  const userMode = React.useContext(AuthContext).mode;
 
   React.useEffect(() => {
     (async () => {
@@ -106,36 +33,62 @@ export default function AdminScreen() {
         title,
         message,
         [
+          {text: "Cancel", onPress: () => setScanned(false)},
           {text: "Confirm", onPress: () => {setConfirm(true); setScanned(false)}},
-          {text: "Cancel", onPress: () => setScanned(false)}
         ], {cancelable: false});
   }
 
   const handleBarCodeScanned = ({ type, data }) => {
+    const REACT_NATIVE_SERVER_URL = "http://192.168.1.72:3000";
     setScanned(true);
     showAlert("Confirm Operation", "Please confirm that you are requesting the following action: " + mode);
-    console.log(data);
 
-    // if (data.includes("_hack")) {
-    //   data = data.slice(0, -5);
-    //   addUser(data);
-    // }
-    // if (data.includes("_food")) {
-    //   data = data.slice(0, -5);
-    //   setFoodCheckIn(data);
-    // }
-    // if (data.includes("clear")) {
-    //   clearDatabase();
-    // }
+    let json = JSON.parse(data);
+    let attendee_id = json.id;
     if(confirm) {
       if(mode === "checkin") {
-
+        console.log("woah");
+        fetch(REACT_NATIVE_SERVER_URL + "/api/users/" + attendee_id + "/checkin", {
+          method: 'POST',
+          headers : {
+            "x-access-token" : authToken
+          }
+        }).then(res => res.json()).then(res => console.log(res));
       }
-      else if(mode === "food") {
-  
+      else if(mode === "lunch") {
+        fetch(REACT_NATIVE_SERVER_URL + "/api/users/" + attendee_id + "/receivedlunch", {
+          method: 'PUT',
+          headers : {
+            "x-access-token" : authToken
+          }
+        }).then(res => res.json()).then(res => console.log(res));
+      }
+      else if(mode === "dinner") {
+        fetch(REACT_NATIVE_SERVER_URL + "/api/users/" + attendee_id + "/receiveddinner", {
+          method: 'PUT',
+          headers : {
+            "x-access-token" : authToken
+          }
+        }).then(res => res.json()).then(res => console.log(res));
       }
       else if(mode === "profile") {
-  
+
+      }
+      else if(mode === "table") {
+        fetch(REACT_NATIVE_SERVER_URL + "/api/users/" + attendee_id + "/addtablevisited", {
+          method: 'PUT',
+          headers : {
+            "x-access-token" : authToken
+          }
+        }).then(res => res.json()).then(res => console.log(res));
+      }
+      else if (mode === "workshop") {
+        fetch(REACT_NATIVE_SERVER_URL + "/api/users/" + attendee_id + "/addworkshopattended", {
+          method: 'PUT',
+          headers : {
+            "x-access-token" : authToken
+          }
+        }).then(res => res.json()).then(res => console.log(res));
       }
     }
   };
@@ -147,15 +100,28 @@ export default function AdminScreen() {
         flexDirection: 'column',
       }}>
       <View>
-        <Picker
+        {userMode === "admin" ? 
+          <Picker
           selectedValue={mode}
           onValueChange={(itemValue, itemIndex) => 
             setMode(itemValue)
           }>
-          <Picker.Item label="Check In" value="checkin" />
-          <Picker.Item label="Food" value="food" />
-          <Picker.Item label="Get Profile" value="profile" />
-        </Picker>
+            <Picker.Item label="Check In" value="checkin" />
+            <Picker.Item label="Mark Lunch" value="lunch" />
+            <Picker.Item label="Mark Dinner" value="dinner" />
+          </Picker>
+          : 
+          <Picker
+          selectedValue={mode}
+          onValueChange={(itemValue, itemIndex) => 
+            setMode(itemValue)
+          }>
+            <Picker.Item label="Profile" value="profile" />
+            <Picker.Item label="Table" value="table" />
+            <Picker.Item label="Workshop" value="workshop" />
+          </Picker> 
+      }
+
       </View>
       <View style={{flexGrow : 1}}>
         <BarCodeScanner
