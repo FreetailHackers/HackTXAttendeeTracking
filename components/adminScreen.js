@@ -2,8 +2,11 @@ import * as React from 'react';
 import { Text, View, TextInput, StyleSheet, Button, Alert } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import PDFReader from 'rn-pdf-reader-js';
-import { viewResumePDF } from './pdfViewer.js';
-export function addUser(user){
+import { resumeScreen } from './pdfViewer.js';
+import { NavigationContainer } from '@react-navigation/native';
+
+
+export function addUser(user, {navigation}){
 
     const requestOptions = {
         method: 'POST',
@@ -24,7 +27,7 @@ export function addUser(user){
                 { text: "Cancel", style: "cancel" },
                 { text: "OK", onPress: () => {
                     console.log("OK pressed");
-                    viewResumePDF(data);
+                 //navigation.navigate('View Resume');
                 } }
               ],
               { cancelable: false }
@@ -38,7 +41,7 @@ export function addUser(user){
                 { text: "Cancel", style: "cancel" },
                 { text: "OK", onPress: () => {
                   console.log("OK pressed");
-                  viewResumePDF(data);
+                 //navigation.navigate('View Resume');
                 } }
               ],
               { cancelable: false }
@@ -147,8 +150,7 @@ export function adminScreen() {
       <BarCodeScanner
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
-      />
-
+      /> 
       {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
     </View>
   );
