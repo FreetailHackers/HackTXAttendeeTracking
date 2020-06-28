@@ -60,7 +60,7 @@ export default function AdminScreen() {
           headers : {
             "x-access-token" : authToken
           }
-        }).then(res => res.json()).then(res => console.log(res));
+        }).then(res => res.json()).then(res => res.message ? showAlert("" + res.message) : null)
       }
       else if(mode === "dinner") {
         fetch(REACT_NATIVE_SERVER_URL + "/api/users/" + attendee_id + "/receiveddinner", {
@@ -68,7 +68,7 @@ export default function AdminScreen() {
           headers : {
             "x-access-token" : authToken
           }
-        }).then(res => res.json()).then(res => console.log(res));
+        }).then(res => res.json()).then(res => res.message ? showAlert("" + res.message) : null)
       }
       else if(mode === "profile") {
 
@@ -99,26 +99,26 @@ export default function AdminScreen() {
         flexDirection: 'column',
       }}>
       <View>
-        {userMode === "admin" ? 
+        {userMode === "admin" ?
           <Picker
           selectedValue={mode}
-          onValueChange={(itemValue, itemIndex) => 
+          onValueChange={(itemValue, itemIndex) =>
             setMode(itemValue)
           }>
             <Picker.Item label="Check In" value="checkin" />
             <Picker.Item label="Mark Lunch" value="lunch" />
             <Picker.Item label="Mark Dinner" value="dinner" />
           </Picker>
-          : 
+          :
           <Picker
           selectedValue={mode}
-          onValueChange={(itemValue, itemIndex) => 
+          onValueChange={(itemValue, itemIndex) =>
             setMode(itemValue)
           }>
             <Picker.Item label="Profile" value="profile" />
             <Picker.Item label="Table" value="table" />
             <Picker.Item label="Workshop" value="workshop" />
-          </Picker> 
+          </Picker>
       }
 
       </View>
