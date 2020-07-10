@@ -2,7 +2,7 @@ import * as AlertFunction from '../utils/alertFunctions';
 import {convertToBase64} from '../utils/utils';
 import {AsyncStorage} from 'react-native';
 
-const SERVER_URL = "<BACKEND QUILL URL>:3000"
+const SERVER_URL = "http://demo-quill-2021.herokuapp.com"
 
 function getRequest(url, onSuccess, onError) {
     return fetch(url)
@@ -20,6 +20,7 @@ function getRequest(url, onSuccess, onError) {
 }
 
 function payloadRequest(type, url, body, token, onSuccess, onError) {
+    console.log("MAKING A REQUEST")
     return fetch(url, {
         method: type,
         headers: {
@@ -90,7 +91,8 @@ export async function markUser(id, route, token, onSuccess, onError) {
 }
 
 export async function getResume(id, onSuccess) {
-    const url = SERVER_URL + "/api/users" + id + "/resume"
+    const url = SERVER_URL + "/api/users/" + id + "/resume"
+    console.log("URL IS " + url)
     await getRequest(url, 
         (response) => onSuccess(convertToBase64(response.Body.data)),
         AlertFunction.errorAlert)

@@ -18,6 +18,10 @@ export default function Camera({navigation}) {
     admin_options : sponsor_options;
 
   useEffect(() => {
+    const onfocus = navigation.addListener('focus', () => {
+        // when coming back to this screen, set scanned to false
+        setScanned(false);
+    });
     (async () => {
       const permission = Platform.OS === 'ios' ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA;
       const status = await check(permission);
@@ -29,6 +33,7 @@ export default function Camera({navigation}) {
         setHasPermission(status2 === RESULTS.GRANTED);
       }
     })();
+    return onfocus;
   }, []);
 
   const handleBarCodeScanned = ({ data }) => {
