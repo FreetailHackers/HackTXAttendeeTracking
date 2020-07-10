@@ -71,7 +71,7 @@ export default function Camera({navigation}) {
   }
 
   return (
-    <SafeAreaView style={hasPermission ? styles.container : styles.centeredContainer}>
+    <View style={hasPermission ? styles.container : styles.centeredContainer}>
       {!hasPermission ? <Text>No Access to Camera</Text>
         :
       <>
@@ -91,7 +91,7 @@ export default function Camera({navigation}) {
       </RNCamera>
       </>
       }
-    </SafeAreaView>
+    </View>
   );
 }
 
