@@ -1,0 +1,11 @@
+{
+    "admin_options": [
+        {"label": "check in attendee", "value": "0", "route": "checkin"},
+        {"label": "mark received lunch", "value": "1", "route": "receivedlunch"},
+        {"label": "mark received dinner", "value": "2", "route": "receiveddinner"}
+    ],
+    "sponsor_options": [
+        {"label": "mark visited booth", "value": "0", "route": "addtablevisited"},
+        {"label": "mark attended workshop", "value": "1", "route": "addworkshopattended"}
+    ]
+}
