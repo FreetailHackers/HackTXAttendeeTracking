@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Text, View, Platform, StyleSheet, StatusBar} from 'react-native';
+import {Text, View, Platform, StyleSheet, StatusBar, SafeAreaView} from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import { PERMISSIONS, check, request, RESULTS } from 'react-native-permissions';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -42,7 +42,7 @@ export default function Camera({navigation}) {
     // create alert
     try {
       const attendee_id = JSON.parse(data).id;
-      if (attendee_id === undefined) 
+      if (attendee_id === undefined)
         throw new Error();
       // ask the user to confirm whether they want to scan
       showAlert("Confirm Action", "Are you sure you want to " + userOptions[mode]['label'] + "?",
@@ -71,7 +71,7 @@ export default function Camera({navigation}) {
   }
 
   return (
-    <View style={hasPermission ? styles.container : styles.centeredContainer}>
+    <SafeAreaView style={hasPermission ? styles.container : styles.centeredContainer}>
       {!hasPermission ? <Text>No Access to Camera</Text>
         :
       <>
@@ -83,15 +83,15 @@ export default function Camera({navigation}) {
         captureAudio={false}
         onChangeItem={newmode => parseInt(setMode(newmode.value))}
       />
-      <RNCamera 
+      <RNCamera
         ref={ref => { this.camera = ref;}}
         barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
         style={styles.camera}
         onBarCodeRead={handleBarCodeScanned}>
-      </RNCamera>   
-      </>   
+      </RNCamera>
+      </>
       }
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -115,6 +115,8 @@ const styles = StyleSheet.create({
     marginTop: 50,
     marginLeft: '5%',
     marginRight: '5%',
+    zIndex: 1,
+    elevation: 1
   },
 
   camera: {

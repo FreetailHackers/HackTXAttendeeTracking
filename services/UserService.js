@@ -1,6 +1,6 @@
 import * as AlertFunction from '../utils/alertFunctions';
 import {convertToBase64} from '../utils/utils';
-import {AsyncStorage} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const SERVER_URL = "http://demo-quill-2021.herokuapp.com"
 
@@ -83,7 +83,7 @@ export async function signOutUser(onCompletion) {
 
 export async function markUser(id, route, token, onSuccess, onError) {
     await payloadRequest('PUT', SERVER_URL + "/api/users/" + id + "/" + route,
-        null, token, onSuccess, 
+        null, token, onSuccess,
         (err) => {
             AlertFunction.errorAlert(err.message ? err.message : undefined, [{text: "OK", onPress: onError}])
         }
@@ -93,7 +93,7 @@ export async function markUser(id, route, token, onSuccess, onError) {
 export async function getResume(id, onSuccess) {
     const url = SERVER_URL + "/api/users/" + id + "/resume"
     console.log("URL IS " + url)
-    await getRequest(url, 
+    await getRequest(url,
         (response) => onSuccess(convertToBase64(response.Body.data)),
         AlertFunction.errorAlert)
 }
